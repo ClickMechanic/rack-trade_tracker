@@ -1,7 +1,8 @@
-require "rack/trade_tracker/version"
-require "rack/trade_tracker/parameters"
+require_relative "trade_tracker/version"
+require_relative "trade_tracker/parameters"
 
 module Rack
+
   class TradeTracker
     
     InitializationError = Class.new(RuntimeError)
@@ -16,4 +17,5 @@ module Rack
     
     attr_reader :domain_name
   end
+
 end
