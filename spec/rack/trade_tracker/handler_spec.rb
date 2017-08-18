@@ -21,6 +21,10 @@ RSpec.describe Rack::TradeTracker::Handler do
 
     context 'with a matching path' do
       let(:url)  { URI.escape("http://www.example.com/path?#{params}") }
+      let(:cookie) { double :cookie, name: 'TT2_ABCDEF', as_hash: {value: '123456::ABC123::ref',
+                                                                   expires: 1.year.from_now,
+                                                                   path: '/',
+                                                                   domain: domain} }
 
       context 'with paired parameters' do
         let(:params) { 'campaignID=ABC123&redirectURL=www.your-proper-url.com' }
@@ -29,6 +33,13 @@ RSpec.describe Rack::TradeTracker::Handler do
           status, headers, body = subject.call(env)
           expect(status).to eq 301
           expect(headers['Location']).to eq Rack::TradeTracker::TRACKBACK_URL
+        end
+
+        it 'creates the Trade Tracker cookie' do
+          allow(Rack::TradeTracker::Cookie).to receive(:new).and_return(cookie)
+          cookie_value = "123456%3A%3AABC123%3A%3Aref; domain=test.com; path=/; expires=#{Rack::Utils.rfc2822(cookie.as_hash[:expires].utc)}"
+          status, headers, body = subject.call(env)
+          expect(headers['set-cookie']).to eq "#{cookie.name}=#{cookie_value}"
         end
 
         context 'with missing redirect URL' do
@@ -54,6 +65,13 @@ RSpec.describe Rack::TradeTracker::Handler do
           status, headers, body = subject.call(env)
           expect(status).to eq 301
           expect(headers['Location']).to eq Rack::TradeTracker::TRACKBACK_URL
+        end
+
+        it 'creates the Trade Tracker cookie' do
+          allow(Rack::TradeTracker::Cookie).to receive(:new).and_return(cookie)
+          cookie_value = "123456%3A%3AABC123%3A%3Aref; domain=test.com; path=/; expires=#{Rack::Utils.rfc2822(cookie.as_hash[:expires].utc)}"
+          status, headers, body = subject.call(env)
+          expect(headers['set-cookie']).to eq "#{cookie.name}=#{cookie_value}"
         end
 
         context 'with missing redirect URL' do

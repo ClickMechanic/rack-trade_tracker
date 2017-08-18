@@ -1,3 +1,6 @@
+require 'active_support/core_ext/integer/time'
+require_relative 'cookie'
+
 module Rack
   class TradeTracker
 
@@ -41,7 +44,13 @@ module Rack
 
       def redirect
         response = Rack::Response.new([], 301, {'Location' => TRACKBACK_URL} )
+        set_cookie(response)
         response.finish
+      end
+
+      def set_cookie(response)
+        cookie = Cookie.new(domain, parameters)
+        response.set_cookie(cookie.name, cookie.as_hash)
       end
     end
 
