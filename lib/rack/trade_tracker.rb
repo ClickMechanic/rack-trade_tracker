@@ -9,13 +9,13 @@ module Rack
     
     def initialize(app, options = {})
       @app = app
-      @domain_name = options[:domain_name]
-      raise InitializationError.new('options must include :domain_name') unless @domain_name
+      raise InitializationError.new('options must include :domain_name') unless (@domain = options[:domain])
+      raise InitializationError.new('options must include :domain_name') unless (@path = options[:path])
     end
     
     private
     
-    attr_reader :domain_name
+    attr_reader :domain, :path
   end
 
 end
