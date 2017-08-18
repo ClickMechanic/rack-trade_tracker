@@ -5,6 +5,7 @@ require_relative "trade_tracker/handler"
 module Rack
 
   class TradeTracker
+    TRACKBACK_URL = 'http://tc.tradetracker.net/'
     
     InitializationError = Class.new(RuntimeError)
     

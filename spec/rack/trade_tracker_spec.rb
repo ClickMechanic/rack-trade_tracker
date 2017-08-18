@@ -21,7 +21,7 @@ RSpec.describe Rack::TradeTracker do
 
   describe 'call' do
     let(:env) { env_for(url) }
-    let(:url)  { 'www.example.com/path' }
+    let(:url)  { 'http://www.example.com/path' }
 
     it 'delegates to the Handler' do
       handler = double(:handler)
