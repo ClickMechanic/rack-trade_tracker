@@ -2,34 +2,32 @@ require 'spec_helper'
 
 RSpec.describe Rack::TradeTracker do
   let(:app) { ->(env) { [200, env, 'app'] } }
-  
-  subject { Rack::TradeTracker.new(app, domain: 'test.com', path: '/path') }
+  let(:domain) { 'test.com' }
+  let(:path) { '/path' }
+
+  subject { Rack::TradeTracker.new(app, domain: domain, path: path) }
   
   it 'has a version number' do
     expect(Rack::TradeTracker::VERSION).not_to be nil
   end
 
   it 'requires a domain' do
-    expect { Rack::TradeTracker.new(app, path: '/path') }.to raise_error(Rack::TradeTracker::InitializationError)
+    expect { Rack::TradeTracker.new(app, path: path) }.to raise_error(Rack::TradeTracker::InitializationError)
   end
 
   it 'requires a path' do
-    expect { Rack::TradeTracker.new(app, domain: 'test.com') }.to raise_error(Rack::TradeTracker::InitializationError)
+    expect { Rack::TradeTracker.new(app, domain: domain) }.to raise_error(Rack::TradeTracker::InitializationError)
   end
 
   describe 'call' do
-    context 'with an alternate path' do
-      let(:url)  { 'www.example.com/some-other-path' }
-      let(:env) { env_for(url) }
+    let(:env) { env_for(url) }
+    let(:url)  { 'www.example.com/path' }
 
-      it 'passes the call along' do
-        expect(app).to receive(:call).with(env)
-        subject.call(env)
-      end
+    it 'delegates to the Handler' do
+      handler = double(:handler)
+      allow(Rack::TradeTracker::Handler).to receive(:new).with(domain, path, app).and_return(handler)
+      expect(handler).to receive(:call).with(env)
+      subject.call(env)
     end
-  end
-
-  def env_for(url)
-    Rack::MockRequest.env_for(url)
   end
 end

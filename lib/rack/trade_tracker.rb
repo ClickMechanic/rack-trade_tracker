@@ -1,5 +1,6 @@
 require_relative "trade_tracker/version"
 require_relative "trade_tracker/parameters"
+require_relative "trade_tracker/handler"
 
 module Rack
 
@@ -14,12 +15,12 @@ module Rack
     end
 
     def call(env)
-      @app.call(env)
+      Handler.new(domain, path, app).call(env)
     end
-    
+
     private
-    
-    attr_reader :domain, :path
+
+    attr_reader :app, :domain, :path
   end
 
 end
