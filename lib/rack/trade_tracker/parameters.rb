@@ -27,7 +27,7 @@ module Rack
         PERMITTED_PARAMS.each_with_object({}) do |param, result|
           key = param.underscore.to_sym
           result[key] = send(key)
-        end
+        end.merge(redirect_url: redirect_url)
       end
 
     end

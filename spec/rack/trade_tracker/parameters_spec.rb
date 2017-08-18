@@ -18,7 +18,12 @@ RSpec.describe Rack::TradeTracker::Parameters do
     end
 
     it 'converts to a hash' do
-      expected = {campaign_id: 'a-campaign-id', material_id: 'a-material-id', affiliate_id: 'an-affiliate-id', reference: ''}
+      expected = {campaign_id: subject.campaign_id,
+                  material_id: subject.material_id,
+                  affiliate_id: subject.affiliate_id,
+                  reference: subject.reference,
+                  redirect_url: subject.redirect_url}
+
       expect(subject.to_hash).to eq expected
     end
 
@@ -47,7 +52,8 @@ RSpec.describe Rack::TradeTracker::Parameters do
           expected = {campaign_id: subject.campaign_id,
                       material_id: subject.material_id,
                       affiliate_id: subject.affiliate_id,
-                      reference: subject.reference}
+                      reference: subject.reference,
+                      redirect_url: subject.redirect_url}
 
           expect(subject.to_hash).to eq expected
         end

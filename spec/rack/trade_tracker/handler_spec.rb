@@ -27,16 +27,41 @@ RSpec.describe Rack::TradeTracker::Handler do
                                                                    domain: domain} }
 
       shared_examples 'redirects with cookie' do
+        attr_reader :status, :headers, :body, :redirect_url, :query
+
+        before do
+          allow(Rack::TradeTracker::Cookie).to receive(:new).and_return(cookie)
+          @status, @headers, @body = subject.call(env)
+          url = URI(headers['Location'])
+          @redirect_url = URI::HTTP.build(host: url.host).to_s
+          @query = url.query.split('&').map { |attr| attr.split('=', -1) }.to_h if url.query
+        end
+
         it 'redirects to the trackback URL' do
-          status, headers, body = subject.call(env)
           expect(status).to eq 301
-          expect(headers['Location']).to eq Rack::TradeTracker::TRACKBACK_URL
+          expect(redirect_url).to eq Rack::TradeTracker::TRACKBACK_URL
+        end
+
+        it 'includes the campaign_id parameter' do
+          expect(query['c']).to eq 'ABCDEF'
+        end
+
+        it 'includes the material_id parameter' do
+          expect(query['m']).to eq '123456'
+        end
+
+        it 'includes the affiliate_id parameter' do
+          expect(status).to eq 301
+          expect(query['a']).to eq 'ABC123'
+        end
+
+        it 'includes the redirect_url parameter' do
+          expect(status).to eq 301
+          expect(query['u']).to eq 'www.your-proper-url.com'
         end
 
         it 'creates the Trade Tracker cookie' do
-          allow(Rack::TradeTracker::Cookie).to receive(:new).and_return(cookie)
           cookie_value = "123456%3A%3AABC123%3A%3Aref; domain=test.com; path=/; expires=#{Rack::Utils.rfc2822(cookie.as_hash[:expires].utc)}"
-          status, headers, body = subject.call(env)
           expect(headers['set-cookie']).to eq "#{cookie.name}=#{cookie_value}"
         end
       end
@@ -56,24 +81,24 @@ RSpec.describe Rack::TradeTracker::Handler do
 
       context 'with paired parameters' do
         include_examples 'redirects with cookie' do
-          let(:params) { 'campaignID=ABC123&redirectURL=www.your-proper-url.com' }
+          let(:params) { 'campaignID=ABCDEF&materialID=123456&affiliateID=ABC123&redirectURL=www.your-proper-url.com' }
         end
 
         context 'with missing redirect URL' do
           include_examples 'missing redirect URL' do
-            let(:params) { 'campaignID=ABC123' }
+            let(:params) { 'campaignID=ABCDEF' }
           end
         end
       end
 
       context 'with delimited parameters' do
         include_examples 'redirects with cookie' do
-          let(:params) { 'tt=ABC123_123456&r=www.your-proper-url.com' }
+          let(:params) { 'tt=ABCDEF_123456_ABC123_ref&r=www.your-proper-url.com' }
         end
 
         context 'with missing redirect URL' do
           include_examples 'missing redirect URL' do
-            let(:params) { 'tt=ABC123_123456' }
+            let(:params) { 'tt=ABCDEF_123456' }
           end
         end
       end
