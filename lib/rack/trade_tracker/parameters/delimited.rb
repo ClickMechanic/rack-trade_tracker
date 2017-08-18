@@ -16,9 +16,9 @@ module Rack
         private
 
         def extract(params)
-          return unless (param = params[TT_PARAM]).present?
+          param = params[TT_PARAM]
 
-          values = param.split(DELIMITER)
+          values = param.present? ? param.split(DELIMITER) : []
 
           PERMITTED_PARAMS.each_with_index do |param, index|
             class_eval do

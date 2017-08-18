@@ -42,6 +42,17 @@ RSpec.describe Rack::TradeTracker::Parameters do
           expect(subject.redirect_url).to eq 'www.your-proper-url.com'
         end
       end
+
+      context 'with missing tt and redirect parameters' do
+        let(:params) { {} }
+
+        it 'defaults to empty strings' do
+          Rack::TradeTracker::Parameters::Delimited::PERMITTED_PARAMS.each do |param|
+            expect(subject.send(param.underscore)).to eq ''
+            expect(subject.redirect_url).to eq ''
+          end
+        end
+      end
     end
   end
 end
