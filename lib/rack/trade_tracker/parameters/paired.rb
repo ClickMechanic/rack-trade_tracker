@@ -5,7 +5,9 @@ module Rack
     module Parameters
 
       class Paired
-        PERMITTED_PARAMS = %w(campaignID materialID affiliateID redirectURL)
+        include Parameters
+
+        REDIRECT_PARAM = 'redirectURL'
 
         def initialize(params)
           extract(params)
@@ -14,7 +16,7 @@ module Rack
         private
 
         def extract(params)
-          PERMITTED_PARAMS.each do |param|
+          (PERMITTED_PARAMS.dup << REDIRECT_PARAM).each do |param|
             class_eval do
               define_method param.underscore do
                 params[param] || MISSING_PARAM_VALUE

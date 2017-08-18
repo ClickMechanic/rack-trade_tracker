@@ -17,6 +17,11 @@ RSpec.describe Rack::TradeTracker::Parameters do
       end
     end
 
+    it 'converts to a hash' do
+      expected = {campaign_id: 'a-campaign-id', material_id: 'a-material-id', affiliate_id: 'an-affiliate-id', reference: ''}
+      expect(subject.to_hash).to eq expected
+    end
+
     context 'with a missing parameter' do
       before { params.delete('materialID') }
       
@@ -29,13 +34,22 @@ RSpec.describe Rack::TradeTracker::Parameters do
   context 'when request includes tt parameter' do
     (1..4).each do |num_params|
       context "with #{num_params} values" do
-        let(:provided_params) { Rack::TradeTracker::Parameters::Delimited::PERMITTED_PARAMS[0..(num_params - 1)] }
+        let(:provided_params) { Rack::TradeTracker::Parameters::PERMITTED_PARAMS[0..(num_params - 1)] }
         let(:params) { {'tt' => num_params.times.map(&:to_s).join('_'), 'r' => 'www.your-proper-url.com'} }
 
         it 'extracts the parameters correctly' do
           provided_params.each_with_index do |param, index|
             expect(subject.send(param.underscore)).to eq index.to_s
           end
+        end
+
+        it 'converts to a hash' do
+          expected = {campaign_id: subject.campaign_id,
+                      material_id: subject.material_id,
+                      affiliate_id: subject.affiliate_id,
+                      reference: subject.reference}
+
+          expect(subject.to_hash).to eq expected
         end
 
         it 'extracts the redirect url' do
@@ -47,7 +61,7 @@ RSpec.describe Rack::TradeTracker::Parameters do
         let(:params) { {} }
 
         it 'defaults to empty strings' do
-          Rack::TradeTracker::Parameters::Delimited::PERMITTED_PARAMS.each do |param|
+          Rack::TradeTracker::Parameters::PERMITTED_PARAMS.each do |param|
             expect(subject.send(param.underscore)).to eq ''
             expect(subject.redirect_url).to eq ''
           end

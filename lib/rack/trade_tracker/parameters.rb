@@ -9,6 +9,7 @@ module Rack
       CAMPAIGN_ID_PARAM = 'campaignID'
       TT_PARAM = 'tt'
       MISSING_PARAM_VALUE = ''
+      PERMITTED_PARAMS = %w(campaignID materialID affiliateID reference)
 
       class << self
         def build(params)
@@ -19,6 +20,13 @@ module Rack
 
         def extract(params)
           params.include?(CAMPAIGN_ID_PARAM) ? Paired.new(params) : Delimited.new(params)
+        end
+      end
+
+      def to_hash
+        PERMITTED_PARAMS.each_with_object({}) do |param, result|
+          key = param.underscore.to_sym
+          result[key] = send(key)
         end
       end
 

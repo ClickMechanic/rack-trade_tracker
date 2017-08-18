@@ -5,9 +5,10 @@ module Rack
     module Parameters
 
       class Delimited
+        include Parameters
+
         DELIMITER = '_'
         REDIRECT_PARAM = 'r'
-        PERMITTED_PARAMS = %w(campaignID materialID affiliateID reference)
 
         def initialize(params)
           extract(params)
