@@ -10,3 +10,12 @@
 
 # rspec failure tracking
 .rspec_status
+
+# Ignore any .idea project files
+/.idea
+.idea/workspace.xml
+*.iml
+
+# Ignore temporary example files
+index.rb
+index.aspx
