@@ -16,7 +16,7 @@ module Rack
 
         return redirect_to_root unless valid_params?
 
-        [301, {'Location' => TRACKBACK_URL}, []]
+        redirect
       end
 
       private
@@ -36,7 +36,12 @@ module Rack
       end
 
       def redirect_to_root
-        [302, {'Location' => request.base_url}, []]
+        Rack::Response.new([], 302, {'Location' => request.base_url} ).finish
+      end
+
+      def redirect
+        response = Rack::Response.new([], 301, {'Location' => TRACKBACK_URL} )
+        response.finish
       end
     end
 
