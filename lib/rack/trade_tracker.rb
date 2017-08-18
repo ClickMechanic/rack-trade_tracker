@@ -12,6 +12,10 @@ module Rack
       raise InitializationError.new('options must include :domain_name') unless (@domain = options[:domain])
       raise InitializationError.new('options must include :domain_name') unless (@path = options[:path])
     end
+
+    def call(env)
+      @app.call(env)
+    end
     
     private
     

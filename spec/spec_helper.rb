@@ -1,4 +1,5 @@
 require "bundler/setup"
+require 'rack/mock'
 require "rack/trade_tracker"
 
 RSpec.configure do |config|
