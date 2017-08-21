@@ -10,18 +10,14 @@ Gem::Specification.new do |spec|
   spec.email         = ["ben@clickmechanic.com"]
 
   spec.summary       = "Provides TradeTracker redirect endpoint as Rack middleware" 
-  spec.description   = <<~DESC
-   TradeTracker.com operates using a redirect mechanism.
-    This gem enables this redirection as Rack middleware so that it is
-    isolated from the main (e.g. Rails) app.
-  DESC
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.description   = "The Rack::TradeTracker gem is for use with the Trade Tracker affiliate network.  The gem provides a Rack middleware component to handle Trade Tracker's redirect mechanism."
+  spec.homepage      = "https://github.com/ClickMechanic/rack-trade_tracker"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
   if spec.respond_to?(:metadata)
-    spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
+    spec.metadata["allowed_push_host"] = "https://rubygems.org"
   else
     raise "RubyGems 2.0 or newer is required to protect against " \
       "public gem pushes."

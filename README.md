@@ -1,8 +1,8 @@
 # Rack::TradeTracker
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/rack/trade_tracker`. To experiment with that code, run `bin/console` for an interactive prompt.
+The `Rack::TradeTracker` gem is for use with the Trade Tracker affiliate network.
 
-TODO: Delete this and the text above, and describe your gem
+The gem provides a [Rack middleware](http://guides.rubyonrails.org/rails_on_rack.html) component to handle Trade Tracker's redirect mechanism.
 
 ## Installation
 
@@ -22,7 +22,31 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Note that `domain:` and `path:` are required options and you will get an error if you don't provide these:
+- Replace `'your-domain'` with your domain name minus `www`; e.g. `clickmechanic.com`.
+- Replace `'your-path'` with the target path you have agreed with Trade Tracker; e.g. `/repair` (note the leading `/`)
+
+> The gem makes no assumptions about where and how you implement the Trade Tracker JS script.  You will need to do this yourself.
+
+### `config.ru`
+If you are running a basic Rack app, you can configure the middleware in your `config.ru` file:
+```ruby
+use Rack::TradeTracker, domain: 'your-domain', path: '/your_path'
+```
+
+### Rails
+If you are using Rails, you can configure the rack middleware in `config/application.rb`, or one of the `config/environments/<environment>.rb` files, using one of the provided helper methods:
+```Ruby
+config.middleware.use('Rack::TradeTracker', domain: 'your-domain', path: 'your-path')
+
+# or
+config.middleware.insert_before(existing_middleware, 'Rack::TradeTracker', domain: 'your-domain', path: 'your-path')
+
+# or
+config.middleware.insert_after(existing_middleware, 'Rack::TradeTracker', domain: 'your-domain', path: 'your-path')
+```
+
+
 
 ## Development
 
