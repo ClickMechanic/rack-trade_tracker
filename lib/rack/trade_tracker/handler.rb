@@ -55,6 +55,7 @@ module Rack
       def redirect
         response = Rack::Response.new([], 301, {'Location' => redirect_url} )
         set_cookie(response)
+        set_p3p_header(response)
         response.finish
       end
 
@@ -68,6 +69,10 @@ module Rack
       def set_cookie(response)
         cookie = Cookie.new(domain, parameters)
         response.set_cookie(cookie.name, cookie.as_hash)
+      end
+
+      def set_p3p_header(response)
+        response.headers['P3P'] = 'CP="ALL PUR DSP CUR ADMi DEVi CONi OUR COR IND"'
       end
     end
 

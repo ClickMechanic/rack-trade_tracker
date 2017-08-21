@@ -64,6 +64,10 @@ RSpec.describe Rack::TradeTracker::Handler do
           cookie_value = "123456%3A%3AABC123%3A%3Aref; domain=test.com; path=/; expires=#{Rack::Utils.rfc2822(cookie.as_hash[:expires].utc)}"
           expect(headers['set-cookie']).to eq "#{cookie.name}=#{cookie_value}"
         end
+
+        it 'adds the P3P header' do
+          expect(headers['P3P']).to eq 'CP="ALL PUR DSP CUR ADMi DEVi CONi OUR COR IND"'
+        end
       end
 
       shared_examples 'missing redirect URL' do
