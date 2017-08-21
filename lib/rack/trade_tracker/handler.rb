@@ -11,6 +11,8 @@ module Rack
                     reference: :r,
                     redirect_url: :u}
 
+      LOGGER_REGEX = /logger/i
+
       def initialize(domain, path, app)
         @domain = domain
         @path = path
@@ -30,7 +32,7 @@ module Rack
 
       private
 
-      attr_reader :domain, :path, :app, :env, :request
+      attr_reader :domain, :path, :app, :env, :request, :cookie
 
       def matches_path?
         request.path == path
@@ -49,14 +51,17 @@ module Rack
       end
 
       def redirect_to_root
-        Rack::Response.new([], 302, {'Location' => request.base_url} ).finish
+        response(302, {'Location' => request.base_url} ) do
+          log('Redirecting to root as Trade Tracker redirect URL empty', :error)
+        end
       end
 
       def redirect
-        response = Rack::Response.new([], 301, {'Location' => redirect_url} )
-        set_cookie(response)
-        set_p3p_header(response)
-        response.finish
+        response(301, {'Location' => redirect_url} ) do |response|
+          set_cookie(response)
+          set_p3p_header(response)
+          log("Redirecting to Trade Tracker with cookie: #{URI.encode(cookie.value)}")
+        end
       end
 
       def redirect_url
@@ -66,13 +71,29 @@ module Rack
         url.to_s
       end
 
+      def response(status, header)
+        Rack::Response.new([], status, header).tap do |response|
+          yield response if block_given?
+        end.finish
+      end
+
       def set_cookie(response)
-        cookie = Cookie.new(domain, parameters)
+        @cookie ||= Cookie.new(domain, parameters)
         response.set_cookie(cookie.name, cookie.as_hash)
       end
 
       def set_p3p_header(response)
         response.headers['P3P'] = 'CP="ALL PUR DSP CUR ADMi DEVi CONi OUR COR IND"'
+      end
+
+      def log(message, level = :info)
+        return unless logger
+
+        logger.send(level, message) if logger.respond_to?(level)
+      end
+
+      def logger
+        @logger ||= env.find { |key, _| LOGGER_REGEX.match(key) }&.[] 1
       end
     end
 

@@ -21,7 +21,7 @@ RSpec.describe Rack::TradeTracker::Handler do
 
     context 'with a matching path' do
       let(:url)  { URI.escape("http://www.example.com/path?#{params}") }
-      let(:cookie) { double :cookie, name: 'TT2_ABCDEF', as_hash: {value: '123456::ABC123::ref',
+      let(:cookie) { double :cookie, name: 'TT2_ABCDEF', value: '123456::ABC123::ref', as_hash: {value: '123456::ABC123::ref',
                                                                    expires: 1.year.from_now,
                                                                    path: '/',
                                                                    domain: domain} }
@@ -68,6 +68,17 @@ RSpec.describe Rack::TradeTracker::Handler do
         it 'adds the P3P header' do
           expect(headers['P3P']).to eq 'CP="ALL PUR DSP CUR ADMi DEVi CONi OUR COR IND"'
         end
+
+        context 'with a logger defined in the rack env' do
+          let(:logger) { double :logger, info: nil }
+
+          before { env['rack.logger'] = logger }
+
+          it 'logs the redirect' do
+            subject.call(env)
+            expect(logger).to have_received(:info).with("Redirecting to Trade Tracker with cookie: #{URI.encode('123456::ABC123::ref')}")
+          end
+        end
       end
 
       shared_examples 'missing redirect URL' do
@@ -80,6 +91,17 @@ RSpec.describe Rack::TradeTracker::Handler do
         it 'does not forward the request' do
           expect(app).not_to receive(:call)
           subject.call(env)
+        end
+
+        context 'with a logger defined in the rack env' do
+          let(:logger) { double :logger, error: nil }
+
+          before { env['rack.logger'] = logger }
+
+          it 'logs the redirect' do
+            subject.call(env)
+            expect(logger).to have_received(:error).with('Redirecting to root as Trade Tracker redirect URL empty')
+          end
         end
       end
 
