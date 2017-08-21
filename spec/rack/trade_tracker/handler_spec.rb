@@ -26,20 +26,20 @@ RSpec.describe Rack::TradeTracker::Handler do
                                                                    path: '/',
                                                                    domain: domain} }
 
-      shared_examples 'redirects with cookie' do
-        attr_reader :status, :headers, :body, :redirect_url, :query
+      shared_examples 'redirects with cookie' do |redirect_url|
+        attr_reader :status, :headers, :body, :trackback_url, :query
 
         before do
           allow(Rack::TradeTracker::Cookie).to receive(:new).and_return(cookie)
           @status, @headers, @body = subject.call(env)
           url = URI(headers['Location'])
-          @redirect_url = URI::HTTP.build(host: url.host).to_s
+          @trackback_url = URI::HTTP.build(host: url.host).to_s
           @query = url.query.split('&').map { |attr| attr.split('=', -1) }.to_h if url.query
         end
 
         it 'redirects to the trackback URL' do
           expect(status).to eq 301
-          expect(redirect_url).to eq Rack::TradeTracker::TRACKBACK_URL
+          expect(trackback_url).to eq Rack::TradeTracker::TRACKBACK_URL
         end
 
         it 'includes the campaign_id parameter' do
@@ -57,7 +57,7 @@ RSpec.describe Rack::TradeTracker::Handler do
 
         it 'includes the redirect_url parameter' do
           expect(status).to eq 301
-          expect(query['u']).to eq 'www.your-proper-url.com'
+          expect(query['u']).to eq redirect_url
         end
 
         it 'creates the Trade Tracker cookie' do
@@ -81,7 +81,33 @@ RSpec.describe Rack::TradeTracker::Handler do
         end
       end
 
-      shared_examples 'missing redirect URL' do
+      context 'with paired parameters' do
+        include_examples 'redirects with cookie', 'www.your-proper-url.com' do
+          let(:params) { 'campaignID=ABCDEF&materialID=123456&affiliateID=ABC123&redirectURL=www.your-proper-url.com' }
+        end
+
+        context 'with missing redirect URL' do
+          include_examples 'redirects with cookie', '' do
+            let(:params) { 'campaignID=ABCDEF&materialID=123456&affiliateID=ABC123' }
+          end
+        end
+      end
+
+      context 'with delimited parameters' do
+        include_examples 'redirects with cookie', 'www.your-proper-url.com' do
+          let(:params) { 'tt=ABCDEF_123456_ABC123_ref&r=www.your-proper-url.com' }
+        end
+
+        context 'with missing redirect URL' do
+          include_examples 'redirects with cookie', '' do
+            let(:params) { 'tt=ABCDEF_123456_ABC123_ref' }
+          end
+        end
+      end
+
+      context 'with missing campaignID and tt parameters' do
+        let(:params) { '' }
+
         it 'redirects to root with 302' do
           status, headers, body = subject.call(env)
           expect(status).to eq 302
@@ -100,31 +126,7 @@ RSpec.describe Rack::TradeTracker::Handler do
 
           it 'logs the redirect' do
             subject.call(env)
-            expect(logger).to have_received(:error).with('Redirecting to root as Trade Tracker redirect URL empty')
-          end
-        end
-      end
-
-      context 'with paired parameters' do
-        include_examples 'redirects with cookie' do
-          let(:params) { 'campaignID=ABCDEF&materialID=123456&affiliateID=ABC123&redirectURL=www.your-proper-url.com' }
-        end
-
-        context 'with missing redirect URL' do
-          include_examples 'missing redirect URL' do
-            let(:params) { 'campaignID=ABCDEF' }
-          end
-        end
-      end
-
-      context 'with delimited parameters' do
-        include_examples 'redirects with cookie' do
-          let(:params) { 'tt=ABCDEF_123456_ABC123_ref&r=www.your-proper-url.com' }
-        end
-
-        context 'with missing redirect URL' do
-          include_examples 'missing redirect URL' do
-            let(:params) { 'tt=ABCDEF_123456' }
+            expect(logger).to have_received(:error).with('Redirecting to root as Trade Tracker parameters missing')
           end
         end
       end

@@ -11,6 +11,8 @@ module Rack
       MISSING_PARAM_VALUE = ''
       PERMITTED_PARAMS = %w(campaignID materialID affiliateID reference)
 
+      MissingParametersError = Class.new(RuntimeError)
+
       class << self
         def build(params)
           extract(params)
@@ -19,7 +21,13 @@ module Rack
         private
 
         def extract(params)
-          params.include?(CAMPAIGN_ID_PARAM) ? Paired.new(params) : Delimited.new(params)
+          if params.include?(CAMPAIGN_ID_PARAM)
+            Paired.new(params)
+          elsif params.include?(TT_PARAM)
+            Delimited.new(params)
+          else
+            fail MissingParametersError.new("URL must include either 'CampaignID' or 'tt' parameter")
+          end
         end
       end
 

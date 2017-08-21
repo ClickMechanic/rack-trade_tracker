@@ -62,16 +62,13 @@ RSpec.describe Rack::TradeTracker::Parameters do
           expect(subject.redirect_url).to eq 'www.your-proper-url.com'
         end
       end
+    end
 
-      context 'with missing tt and redirect parameters' do
-        let(:params) { {} }
+    context 'with missing tt and campaignID parameters' do
+      let(:params) { {} }
 
-        it 'defaults to empty strings' do
-          Rack::TradeTracker::Parameters::PERMITTED_PARAMS.each do |param|
-            expect(subject.send(param.underscore)).to eq ''
-            expect(subject.redirect_url).to eq ''
-          end
-        end
+      it 'fails with MissingParametersError' do
+        expect{ subject }.to raise_error Rack::TradeTracker::Parameters::MissingParametersError
       end
     end
   end

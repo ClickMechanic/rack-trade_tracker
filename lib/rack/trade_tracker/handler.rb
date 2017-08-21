@@ -25,9 +25,11 @@ module Rack
 
         return @app.call(env) unless matches_path?
 
-        return redirect_to_root unless valid_params?
-
-        redirect
+        begin
+          redirect
+        rescue Parameters::MissingParametersError
+          redirect_to_root
+        end
       end
 
       private
@@ -36,10 +38,6 @@ module Rack
 
       def matches_path?
         request.path == path
-      end
-
-      def valid_params?
-        !parameters.redirect_url.empty?
       end
 
       def parameters
@@ -52,7 +50,7 @@ module Rack
 
       def redirect_to_root
         response(302, {'Location' => request.base_url} ) do
-          log('Redirecting to root as Trade Tracker redirect URL empty', :error)
+          log("Redirecting to root as Trade Tracker parameters missing", :error)
         end
       end
 
