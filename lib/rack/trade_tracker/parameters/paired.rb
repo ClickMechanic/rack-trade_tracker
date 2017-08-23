@@ -2,20 +2,18 @@ require_relative '../parameters'
 
 module Rack
   class TradeTracker
-    module Parameters
+    class Parameters
 
-      class Paired
-        include Parameters
-
+      module Paired
         REDIRECT_PARAM = 'redirectURL'.freeze
 
-        def initialize(params)
-          extract(params)
+        def self.extended(parameters)
+          parameters.send(:extract)
         end
 
         private
 
-        def extract(params)
+        def extract
           (PERMITTED_PARAMS.dup << REDIRECT_PARAM).each do |param|
             class_eval do
               define_method param.underscore do
