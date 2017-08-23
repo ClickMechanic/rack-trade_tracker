@@ -5,7 +5,7 @@ require_relative 'parameters/delimited'
 
 module Rack
   class TradeTracker
-    module Parameters
+    class Parameters
       CAMPAIGN_ID_PARAM = 'campaignID'.freeze
       TT_PARAM = 'tt'.freeze
       MISSING_PARAM_VALUE = ''.freeze
@@ -13,21 +13,15 @@ module Rack
 
       MissingParametersError = Class.new(RuntimeError)
 
-      class << self
-        def build(params)
-          extract(params)
-        end
 
-        private
-
-        def extract(params)
-          if params.include?(CAMPAIGN_ID_PARAM)
-            Paired.new(params)
-          elsif params.include?(TT_PARAM)
-            Delimited.new(params)
-          else
-            fail MissingParametersError.new("URL must include either 'CampaignID' or 'tt' parameter")
-          end
+      def initialize(params)
+        @params = params
+        if params.include?(CAMPAIGN_ID_PARAM)
+          extend Paired
+        elsif params.include?(TT_PARAM)
+          extend Delimited
+        else
+          fail MissingParametersError.new("URL must include either '#{CAMPAIGN_ID_PARAM}' or '#{TT_PARAM}' parameter")
         end
       end
 
@@ -38,6 +32,9 @@ module Rack
         end.merge(redirect_url: redirect_url)
       end
 
+      private
+
+      attr_reader :params
     end
   end
 end

@@ -1,4 +1,5 @@
 require 'active_support/core_ext/integer/time'
+
 require_relative 'cookie'
 
 module Rack
@@ -41,7 +42,7 @@ module Rack
       end
 
       def parameters
-        @_parameters ||= Parameters.build(request.params)
+        @_parameters ||= Parameters.new(request.params)
       end
 
       def params_hash

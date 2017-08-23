@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Rack::TradeTracker::Parameters do
   let(:request) { double :request, params: params }
-  subject { Rack::TradeTracker::Parameters.build(request.params) }
+  subject { Rack::TradeTracker::Parameters.new(request.params) }
 
   context 'when request includes campaignID parameter' do
     let(:params) { {'campaignID' => 'a-campaign-id',
