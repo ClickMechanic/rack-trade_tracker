@@ -7,13 +7,9 @@ module Rack
       module Paired
         REDIRECT_PARAM = 'redirectURL'.freeze
 
-        def self.extended(parameters)
-          parameters.send(:extract)
-        end
-
         private
 
-        def extract
+        def extract_params
           (PERMITTED_PARAMS.dup << REDIRECT_PARAM).each do |param|
             class_eval do
               define_method param.underscore do

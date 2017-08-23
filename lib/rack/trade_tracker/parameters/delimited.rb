@@ -8,17 +8,13 @@ module Rack
         DELIMITER = '_'.freeze
         REDIRECT_PARAM = 'r'.freeze
 
-        def self.extended(parameters)
-          parameters.send(:extract)
-        end
-
         def redirect_url
           params[REDIRECT_PARAM] || MISSING_PARAM_VALUE
         end
 
         private
 
-        def extract
+        def extract_params
           param = params[TT_PARAM]
 
           values = param.present? ? param.split(DELIMITER) : []

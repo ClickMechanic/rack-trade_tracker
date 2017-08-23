@@ -13,23 +13,17 @@ module Rack
 
       MissingParametersError = Class.new(RuntimeError)
 
-      class << self
-        def build(params)
-          self.new(params).tap do |instance|
-            if params.include?(CAMPAIGN_ID_PARAM)
-              instance.extend Paired
-            elsif params.include?(TT_PARAM)
-              instance.extend Delimited
-            else
-              fail MissingParametersError.new("URL must include either 'CampaignID' or 'tt' parameter")
-            end
-          end
-        end
-      end
-
 
       def initialize(params)
         @params = params
+        if params.include?(CAMPAIGN_ID_PARAM)
+          extend Paired
+        elsif params.include?(TT_PARAM)
+          extend Delimited
+        else
+          fail MissingParametersError.new("URL must include either '#{CAMPAIGN_ID_PARAM}' or '#{TT_PARAM}' parameter")
+        end
+        extract_params
       end
 
       def to_hash
