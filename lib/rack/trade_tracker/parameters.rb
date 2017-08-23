@@ -23,7 +23,6 @@ module Rack
         else
           fail MissingParametersError.new("URL must include either '#{CAMPAIGN_ID_PARAM}' or '#{TT_PARAM}' parameter")
         end
-        extract_params
       end
 
       def to_hash
