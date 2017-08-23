@@ -9,7 +9,7 @@ module Rack
                     material_id: :m,
                     affiliate_id: :a,
                     reference: :r,
-                    redirect_url: :u}
+                    redirect_url: :u}.freeze
 
       LOGGER_REGEX = /logger/i
 

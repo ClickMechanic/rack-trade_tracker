@@ -7,8 +7,8 @@ module Rack
       class Delimited
         include Parameters
 
-        DELIMITER = '_'
-        REDIRECT_PARAM = 'r'
+        DELIMITER = '_'.freeze
+        REDIRECT_PARAM = 'r'.freeze
 
         def initialize(params)
           extract(params)

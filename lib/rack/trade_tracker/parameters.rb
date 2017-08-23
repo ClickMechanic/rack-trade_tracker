@@ -6,10 +6,10 @@ require_relative 'parameters/delimited'
 module Rack
   class TradeTracker
     module Parameters
-      CAMPAIGN_ID_PARAM = 'campaignID'
-      TT_PARAM = 'tt'
-      MISSING_PARAM_VALUE = ''
-      PERMITTED_PARAMS = %w(campaignID materialID affiliateID reference)
+      CAMPAIGN_ID_PARAM = 'campaignID'.freeze
+      TT_PARAM = 'tt'.freeze
+      MISSING_PARAM_VALUE = ''.freeze
+      PERMITTED_PARAMS = %w(campaignID materialID affiliateID reference).freeze
 
       MissingParametersError = Class.new(RuntimeError)
 

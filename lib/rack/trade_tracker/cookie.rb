@@ -2,10 +2,10 @@ module Rack
   class TradeTracker
 
     class Cookie
-      NAME = 'TT2_%{campaign_id}'
-      DIGEST_PARAMS = [:campaign_id, :material_id, :affiliate_id, :reference]
-      VALUE_PARAMS = [:material_id, :affiliate_id, :reference]
-      PATH = '/'
+      NAME = 'TT2_%{campaign_id}'.freeze
+      DIGEST_PARAMS = [:campaign_id, :material_id, :affiliate_id, :reference].freeze
+      VALUE_PARAMS = [:material_id, :affiliate_id, :reference].freeze
+      PATH = '/'.freeze
 
       def initialize(domain, parameters)
         @domain, @parameters = domain, parameters
@@ -16,7 +16,7 @@ module Rack
       end
 
       def checksum
-        source = "CHK_#{DIGEST_PARAMS.map { |param| params_hash[param]  } .join('::')}"
+        source = "CHK_#{DIGEST_PARAMS.map { |param| params_hash[param]  }.join('::')}"
         Digest::MD5.digest(source)
       end
 

@@ -7,7 +7,7 @@ module Rack
       class Paired
         include Parameters
 
-        REDIRECT_PARAM = 'redirectURL'
+        REDIRECT_PARAM = 'redirectURL'.freeze
 
         def initialize(params)
           extract(params)
