@@ -17,7 +17,7 @@ module Rack
 
       def checksum
         source = "CHK_#{DIGEST_PARAMS.map { |param| params_hash[param]  }.join('::')}"
-        Digest::MD5.digest(source)
+        Digest::MD5.hexdigest(source)
       end
 
       def timestamp
