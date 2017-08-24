@@ -5,7 +5,7 @@ RSpec.describe Rack::TradeTracker::Cookie do
   let(:parameters) { double :parameters, params_hash.merge(to_hash: params_hash) }
   let(:domain) { 'test.com' }
   let(:time_now) { Time.now }
-  let(:digest) { Digest::MD5.digest('CHK_ABCDEF::123456::ABC123::ref') }
+  let(:digest) { Digest::MD5.hexdigest('CHK_ABCDEF::123456::ABC123::ref') }
 
   before { allow(Time).to receive(:now).and_return(time_now) }
 
